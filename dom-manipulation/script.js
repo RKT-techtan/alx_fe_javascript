@@ -15,13 +15,19 @@ newQuoteButton.addEventListener("click", showRandomQuote);
 
 showRandomQuote();
 
-const addQuoteSection = document.createElement("div");
-addQuoteSection.innerHTML = `
-<input type="text" id="newQuoteText" placeholder="New quote">
-<input type="text" id="newQuoteCategory" placeholder="Category">
-<button onclick="addNewQuote()">Add Quote</button>
-`;
-document.body.appendChild(addQuoteSection);
+function createAddQuoteForm() {
+  const addQuoteSection = document.createElement("div");
+  addQuoteSection.innerHTML = `
+  <input type="text" id="newQuoteText" placeholder="New quote">
+  <input type="text" id="newQuoteCategory" placeholder="Category">
+  <button onclick="addNewQuote()">Add Quote</button>
+  `;
+  return addQuoteSection;
+}
+
+const addQuoteForm = createAddQuoteForm();
+document.body.appendChild(addQuoteForm);
+
 
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
