@@ -25,7 +25,7 @@ showRandomQuote();
 
 // This function creates the form to add new quotes.
 function createAddQuoteForm() {
-  // Creates a new div element.  This will hold our form elements.
+  // Creates a new div element. This will hold our form elements.
   const addQuoteSection = document.createElement("div");
 
   // Sets the HTML inside the div.  This creates the input fields and the button.
