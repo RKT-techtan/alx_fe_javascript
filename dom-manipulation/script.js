@@ -14,27 +14,34 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // and you'll need to adapt it to your actual server-side setup.
 async function fetchQuotesFromServer() {
     try {
-        const response = await fetch('/api/quotes'); // Replace with your API endpoint
+        // Using jsonplaceholder for demonstration.  Replace with your actual API.
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts'); // Or your actual API endpoint.
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
 
-        // Check if the data is an array of quotes
-        if (Array.isArray(data)) {
-            quotes = data; // Update the quotes array with server data
+        // jsonplaceholder returns posts, not quotes.  We need to transform the data.
+        // This is a VERY basic transformation. You'll likely need something more
+        // sophisticated for your real data.
+        const transformedQuotes = data.map(post => ({
+            text: post.title, // Use the post title as the quote text
+            category: "General", // Assign a default category (or derive it somehow if your data has it)
+        }));
+
+        // Check if the transformed data is an array of quotes
+        if (Array.isArray(transformedQuotes)) {
+            quotes = transformedQuotes; // Update the quotes array with server data
             saveQuotes(); // Save to local storage
             populateCategories(); // Update category dropdown
             filterQuotes(); // Show a quote
         } else {
-            console.error("Invalid data received from server. Expected an array of quotes.", data);
-            // Optionally, display an error message to the user.
+            console.error("Invalid data received from server. Expected an array of quotes.", transformedQuotes);
             quoteDisplay.innerHTML = "<p>Error loading quotes.</p>";
         }
 
     } catch (error) {
         console.error("Error fetching quotes from server:", error);
-        // Handle the error, e.g., display a message to the user
         quoteDisplay.innerHTML = "<p>Error loading quotes.</p>";
     }
 }
@@ -208,14 +215,4 @@ function filterQuotes() {
     localStorage.setItem('selectedCategory', selectedCategory);
 
     const quoteDisplay = document.getElementById("quoteDisplay"); // Use quoteDisplay
-
-    if (!quoteDisplay) {
-        console.error("Quote display element not found in HTML");
-        return;
-    }
-
-    if (selectedCategory === "all") {
-        showRandomQuote(); // Show a random quote from all categories
-        return; // Important: Exit the
-    }
-  };
+};
