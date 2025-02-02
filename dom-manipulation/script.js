@@ -110,8 +110,7 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]); // Read the file
 }
 
-// The category filter dropdown. Make sure you have this in your HTML with the ID "categoryFilter".
-const categoryFilter = document.getElementById("categoryFilter");
+
 
 // Function to fill the category dropdown with the available categories.
 function populateCategories() {
@@ -151,6 +150,36 @@ function filterQuotes() {
       quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
   });
 
+}
+
+// First, we need to find the dropdown in our HTML.  Hopefully, it's there!
+const categoryFilter = document.getElementById("categoryFilter");
+
+// Time to fill that dropdown with all the different categories.
+function populateCategories() {
+    // A Set is perfect for keeping track of categories - it only allows unique values.
+    const categories = new Set();
+
+    // Let's loop through our quotes and grab each category, adding it to the Set.
+    quotes.forEach(quote => categories.add(quote.category));
+
+    // Clear out any existing options in the dropdown and add the "All Categories" choice.
+    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+    // Now, let's create an option for each unique category we found.
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.text = category;
+        categoryFilter.appendChild(option);
+    });
+
+    // Did the user have a category selected last time? Let's restore it if so.
+    const lastFilter = localStorage.getItem('lastFilter') || 'all'; // Default to "all" if nothing's saved.
+    categoryFilter.value = lastFilter;
+
+    // And finally, let's apply the filter so the quotes are updated right away.
+    filterQuotes();
 }
 
 // Set up the category dropdown when the page loads.
