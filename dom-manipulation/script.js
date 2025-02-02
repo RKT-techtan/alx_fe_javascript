@@ -42,7 +42,23 @@ function createAddQuoteForm() {
   const form = document.createElement("form");
   form.id = "add-quote-form"; // Give it an ID so we can find it later
 
-  // ... (rest of your form creation code - text input, category input, submit button)
+  // Add input elements for text and category, and a submit button
+  const textInput = document.createElement("input");
+  textInput.type = "text";
+  textInput.id = "quote-text-input";
+  textInput.placeholder = "Enter quote text";
+  form.appendChild(textInput);
+
+  const categoryInput = document.createElement("input");
+  categoryInput.type = "text";
+  categoryInput.id = "quote-category-input";
+  categoryInput.placeholder = "Enter category";
+  form.appendChild(categoryInput);
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.textContent = "Add Quote";
+  form.appendChild(submitButton);
 
   form.addEventListener("submit", handleAddQuote);
 
@@ -82,17 +98,46 @@ function handleAddQuote(event) {
   alert("Quote added successfully!");
 
   populateCategories(); // Update the category dropdown
-  filterQuotes();         // Show a relevant quote
+  filterQuotes();        // Show a relevant quote
 }
 
 // Implement JSON Export
 function exportToJson() {
-  // ... (your export to JSON code)
+const jsonString = JSON.stringify(quotes, null, 2); // Beautified JSON
+const blob = new Blob([jsonString], { type: 'application/json' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'quotes.json'; // Filename
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
 }
 
 // Implement JSON Import
 function importFromJsonFile(event) {
-  // ... (your import from JSON code)
+const file = event.target.files[0];
+if (file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedQuotes = JSON.parse(e.target.result);
+      if (Array.isArray(importedQuotes)) {
+        quotes = importedQuotes; // Replace existing quotes
+        saveQuotes();
+        populateCategories();
+        filterQuotes();
+        alert("Quotes imported successfully!");
+      } else {
+        alert("Invalid JSON file. Must be an array of quote objects.");
+      }
+    } catch (error) {
+      alert("Error parsing JSON file: " + error.message);
+    }
+  };
+  reader.readAsText(file);
+}
 }
 
 function saveQuotes() {
@@ -163,5 +208,4 @@ window.addEventListener('DOMContentLoaded', () => {
   showRandomQuote();    // Show a quote when the page loads
   createAddQuoteForm(); // Create the "add quote" form
   populateCategories(); // Call this to populate on load
-  filterQuotes();     // Call this to set initial quote based on stored filter or "all"
 });
