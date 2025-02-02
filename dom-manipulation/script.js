@@ -108,7 +108,7 @@ async function addNewQuote() {
   quotes.push({ text: quoteText, category: quoteCategory });
   await sendQuotesToServer(quotes); // Send to server FIRST
   saveQuotes(); // THEN update local
-  
+
 
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
@@ -170,7 +170,7 @@ function filterQuotes() {
   const selectedCategory = categoryFilter.value;
   localStorage.setItem('lastFilter', selectedCategory);
   const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
-  quoteDisplay.innerHTML = "";
+  quoteDisplay.innerHTML = ""; //Clear existing quotes.
   filteredQuotes.forEach(quote => {
       const quoteElement = document.createElement('p');
       quoteElement.textContent = `"${quote.text}" - ${quote.category}`;
