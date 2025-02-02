@@ -37,3 +37,68 @@ const newQuoteButton = document.getElementById("new-quote-button"); // Assuming 
 if (newQuoteButton) {
   newQuoteButton.addEventListener("click", showRandomQuote);
 }
+
+function createAddQuoteForm() {
+  const form = document.createElement("form");
+  form.id = "add-quote-form";
+
+  const textLabel = document.createElement("label");
+  textLabel.textContent = "Quote Text:";
+  const textInput = document.createElement("input");
+  textInput.type = "text";
+  textInput.id = "quote-text-input";
+  textInput.required = true; // Make the quote text required
+
+  const categoryLabel = document.createElement("label");
+  categoryLabel.textContent = "Category:";
+  const categoryInput = document.createElement("input");
+  categoryInput.type = "text";
+  categoryInput.id = "quote-category-input";
+  categoryInput.required = true;
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.textContent = "Add Quote";
+
+  form.appendChild(textLabel);
+  form.appendChild(textInput);
+  form.appendChild(categoryLabel);
+  form.appendChild(categoryInput);
+  form.appendChild(submitButton);
+
+  form.addEventListener("submit", handleAddQuote); // Add event listener for form submission
+
+  document.body.appendChild(form); // Add the form to the page (you can choose where to add it)
+}
+
+function handleAddQuote(event) {
+  event.preventDefault(); // Prevent the default form submission behavior (page refresh)
+
+  const text = document.getElementById("quote-text-input").value;
+  const category = document.getElementById("quote-category-input").value;
+
+  if (text.trim() === "" || category.trim() === "") {
+    alert("Please enter both quote text and category.");
+    return; // Don't add the quote if fields are empty
+  }
+
+  const newQuote = { text: text, category: category };
+  quotes.push(newQuote); // Add the new quote to the array
+
+  saveQuotesToLocalStorage(); // Save the updated quotes array to local storage
+
+  // Clear the form inputs after successful submission
+  document.getElementById("quote-text-input").value = "";
+  document.getElementById("quote-category-input").value = "";
+
+  alert("Quote added successfully!"); // Or some other user feedback
+
+  showRandomQuote(); // Optionally, display a new random quote after adding one
+}
+
+function saveQuotesToLocalStorage() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// Call createAddQuoteForm() to add the form to the page
+createAddQuoteForm();
