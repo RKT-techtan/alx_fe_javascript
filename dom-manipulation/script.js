@@ -150,6 +150,7 @@ function filterQuotes() {
       quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
       quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
   });
+  
 }
 
 // Set up the category dropdown when the page loads.
