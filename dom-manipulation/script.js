@@ -43,7 +43,7 @@ let serverQuotes = [
   { text: "Server Quote 2", category: "Server" },
 ];
 
-async function fetchServerQuotes() {
+async function fetchServerQuotes() {  // Correct function name
   return new Promise(resolve => {
       setTimeout(() => {
           resolve(serverQuotes);
@@ -62,7 +62,7 @@ async function sendQuotesToServer(quotesToSend) {
 
 async function syncWithServer() {
   try {
-      const fetchedQuotes = await fetchServerQuotes();
+      const fetchedQuotes = await fetchServerQuotes(); // Use correct function name
       quotes = fetchedQuotes; // Server data wins
       saveQuotes();
       showRandomQuote();
