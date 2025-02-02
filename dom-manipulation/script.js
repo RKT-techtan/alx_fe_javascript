@@ -43,7 +43,7 @@ let serverQuotes = [
   { text: "Server Quote 2", category: "Server" },
 ];
 
-async function fetchServerQuotes() {  // Correct function name
+async function fetchServerQuotes() {
   return new Promise(resolve => {
       setTimeout(() => {
           resolve(serverQuotes);
@@ -62,15 +62,33 @@ async function sendQuotesToServer(quotesToSend) {
 
 async function syncWithServer() {
   try {
-      const fetchedQuotes = await fetchServerQuotes(); // Use correct function name
+      const fetchedQuotes = await fetchServerQuotes();
+      const serverQuotesLength = serverQuotes.length;
+      const localQuotesLength = quotes.length;
       quotes = fetchedQuotes; // Server data wins
       saveQuotes();
       showRandomQuote();
       populateCategories();
+
+      const notification = document.getElementById("notification");
+      notification.textContent = "Quotes synced with server.";
+      notification.style.display = "block";
+
+      setTimeout(() => {
+          notification.style.display = "none";
+      }, 3000);
+      if (serverQuotesLength !== localQuotesLength) {
+          console.warn("Quotes synced with server. Server and local quotes are not equal. Conflict might have occurred.")
+      }
       console.log("Quotes synced with server.");
   } catch (error) {
       console.error("Error syncing with server:", error);
-      alert("Error syncing with server. Check the console for details.");
+      const notification = document.getElementById("notification");
+      notification.textContent = "Error syncing with server. Check the console.";
+      notification.style.display = "block";
+      setTimeout(() => {
+          notification.style.display = "none";
+      }, 5000);
   }
 }
 
