@@ -112,47 +112,7 @@ function importFromJsonFile(event) {
 //Space
 
 
-// Function to fill the category dropdown with the available categories.
-function populateCategories() {
-  const categories = new Set(); // Use a Set to get only the unique categories
-  quotes.forEach(quote => categories.add(quote.category)); // Add each quote's category
-
-  categoryFilter.innerHTML = '<option value="all">All Categories</option>'; // Start with the "All Categories" option
-
-  categories.forEach(category => {
-      const option = document.createElement('option'); // Make a new dropdown option
-      option.value = category; // Set the value
-      option.text = category; // Set the displayed text
-      categoryFilter.appendChild(option); // Add it to the dropdown
-  });
-
-  // Remember the last selected filter.
-  const lastFilter = localStorage.getItem('lastFilter') || 'all'; // Get the last one, or default to "all"
-  categoryFilter.value = lastFilter; // Set the dropdown to the last selection
-  filterQuotes(); // Apply the filter
-}
-
-// Function to filter the quotes based on the selected category.
-function filterQuotes() {
-  const selectedCategory = categoryFilter.value; // Which category did they choose?
-  localStorage.setItem('lastFilter', selectedCategory); // Save their choice for next time
-
-  // Filter the quotes. Show all if "all" is selected, otherwise filter by category.
-  const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
-
-  // Clear the quote display. This is *essential* to avoid showing the wrong quotes.
-  quoteDisplay.innerHTML = "";
-
-  // Now add the filtered quotes to the display.
-  filteredQuotes.forEach(quote => {
-      const quoteElement = document.createElement('p'); // Make a paragraph for each quote
-      quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
-      quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
-  });
-
-}
-
-// First, we need to find the dropdown in our HTML.  Hopefully, it's there!
+// First, we need to find the dropdown in our HTML.  Hopefully, it's there!  You'll need to add this <select> element to your HTML.
 const categoryFilter = document.getElementById("categoryFilter");
 
 // Time to fill that dropdown with all the different categories.
@@ -181,6 +141,27 @@ function populateCategories() {
     // And finally, let's apply the filter so the quotes are updated right away.
     filterQuotes();
 }
+
+// Function to filter the quotes based on the selected category.
+function filterQuotes() {
+    const selectedCategory = categoryFilter.value; // Which category did they choose?
+    localStorage.setItem('lastFilter', selectedCategory); // Save their choice for next time
+
+    // Filter the quotes. Show all if "all" is selected, otherwise filter by category.
+    const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
+
+    // Clear the quote display. This is *essential* to avoid showing the wrong quotes.
+    quoteDisplay.innerHTML = "";
+
+    // Now add the filtered quotes to the display.
+    filteredQuotes.forEach(quote => {
+        const quoteElement = document.createElement('p'); // Make a paragraph for each quote
+        quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
+        quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
+    });
+
+}
+
 
 // Set up the category dropdown when the page loads.
 populateCategories();
