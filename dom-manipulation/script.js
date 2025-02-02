@@ -1,5 +1,4 @@
-// This array holds our quotes. It's initially empty and will be populated
-// from local storage or the server.
+// Array to hold the quotes, initialized from local storage or with default values.
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "You learn through trials.", category: "Motivation" },
   { text: "Even a follower is as important as the leader.", category: "Inspiration" },
@@ -10,15 +9,18 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "Everyone is smart in their world, depends what world we need fixing at the time", category: "Clarity" },
 ];
 
-// Function to fetch quotes from the server (using POST and handling data transformation).
+// Variable to store the timeout ID for quote changes.
+let quoteChangeTimeout;
+
+// Function to fetch quotes from the server (using POST).  (You'll need to replace the URL)
 async function fetchQuotesFromServer() {
   try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts', { // Your API endpoint (REPLACE THIS!)
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', { // Replace with your API endpoint
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ // Data to send in the POST request body (REPLACE THIS!)
+          body: JSON.stringify({
               title: 'New Quote Title',
               body: 'New Quote Body',
               userId: 1,
@@ -31,23 +33,15 @@ async function fetchQuotesFromServer() {
 
       const data = await response.json();
 
-      // Handle the response – it could be a single object (POST response) or an array (initial data).
+      // Process the data from the server (can be a single object or an array).
       if (Array.isArray(data)) {
-          const transformedQuotes = data.map(post => ({ // Transform posts to quotes
-              text: post.title, // Adapt this based on your API response
-              category: "General", // Adapt this based on your API response
-          }));
-          quotes = transformedQuotes;
+          quotes = data.map(post => ({ text: post.title, category: "General" })); // Adapt mapping as needed
       } else if (typeof data === 'object' && data !== null) {
-          const newQuote = {
-              text: data.title, // Adapt this based on your API response
-              category: "General", // Adapt this based on your API response
-          };
-          quotes.push(newQuote);
+          quotes.push({ text: data.title, category: "General" }); // Adapt as needed
       } else {
           console.error("Unexpected data format from server:", data);
           quoteDisplay.innerHTML = "<p>Error loading quotes.</p>";
-          return; // Stop processing if data is invalid
+          return;
       }
 
       saveQuotes();
@@ -60,32 +54,30 @@ async function fetchQuotesFromServer() {
   }
 }
 
-// Function to synchronize quotes with the server (if needed).
+// Function to sync quotes with the server. (Replace URL as needed)
 async function syncQuotes() {
   try {
-      const response = await fetch('/api/quotes', { // Your API endpoint for syncing
+      const response = await fetch('/api/quotes', { // Replace with your API endpoint
           method: 'POST', // Or PUT, depending on your API
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify(quotes) // Send the current quotes to the server
+          body: JSON.stringify(quotes)
       });
 
       if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json(); // Process the response from the server (optional)
-      console.log("Quotes synced successfully:", data); // Or update quotes based on server response
+      const data = await response.json();
+      console.log("Quotes synced successfully:", data);
 
   } catch (error) {
       console.error("Error syncing quotes with server:", error);
-      // Handle error, e.g., notify the user
   }
 }
 
-
-// This function shows a random quote on the page.
+// Function to display a random quote.
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
@@ -96,10 +88,42 @@ function showRandomQuote() {
   } else {
       console.error("Quote display element not found in HTML");
   }
+
+  clearTimeout(quoteChangeTimeout); // Clear any existing timeout
+  quoteChangeTimeout = setTimeout(showRandomQuote, 5000); // Set a new timeout
 }
 
-// ... (rest of the code - createAddQuoteForm, handleAddQuote, exportToJson, importFromJsonFile, saveQuotes)
+// Function to create the form for adding new quotes.
+function createAddQuoteForm() {
+  // ... (Form creation code - same as before)
+}
 
+// Function to handle adding a new quote.
+function handleAddQuote(event) {
+  // ... (Quote adding logic - same as before)
+
+  populateCategories();
+  filterQuotes();
+  syncQuotes();
+}
+
+
+// Function to export quotes as JSON.
+function exportToJson() {
+  // ... (JSON export logic - same as before)
+}
+
+// Function to import quotes from a JSON file.
+function importFromJsonFile(event) {
+  // ... (JSON import logic - same as before)
+}
+
+// Function to save quotes to local storage.
+function saveQuotes() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// Function to populate the category filter dropdown.
 function populateCategories() {
   const categorySelect = document.getElementById("categoryFilter");
 
@@ -110,7 +134,7 @@ function populateCategories() {
 
   const uniqueCategories = [...new Set(quotes.map(quote => quote.category))];
 
-  categorySelect.innerHTML = '<option value="">All Categories</option>'; // Add "All Categories" option
+  categorySelect.innerHTML = '<option value="">All Categories</option>';
 
   uniqueCategories.forEach(category => {
       const option = document.createElement('option');
@@ -120,11 +144,11 @@ function populateCategories() {
   });
 }
 
+// Function to filter quotes by category.
 function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
   const filteredQuotes = selectedCategory === "" ? quotes : quotes.filter(quote => quote.category === selectedCategory);
 
-  // Now you can use filteredQuotes to display the quotes you want.  For example, to display a random quote from the filtered list:
   if (filteredQuotes.length > 0) {
       const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
       const randomQuote = filteredQuotes[randomIndex];
@@ -141,17 +165,18 @@ function filterQuotes() {
           quoteDisplay.innerHTML = "<p>No quotes found for this category.</p>";
       }
   }
+
+  clearTimeout(quoteChangeTimeout); // Clear any existing timeout
+  quoteChangeTimeout = setTimeout(showRandomQuote, 5000); // Set a new timeout
 }
 
-
-// Call these functions after the DOM is fully loaded (e.g., in a DOMContentLoaded event listener)
+// Event listener for DOMContentLoaded.
 document.addEventListener('DOMContentLoaded', () => {
-  showRandomQuote();
+  showRandomQuote(); // Initial quote display and starts the timeout chain.
   createAddQuoteForm();
-  populateCategories(); // Call populateCategories after the DOM is ready
-  filterQuotes();
+  populateCategories();
+  filterQuotes(); // Display initial quote based on filter (or all).
 
-  // Example of how to use the filter:
   const categoryFilter = document.getElementById("categoryFilter");
   if (categoryFilter) {
       categoryFilter.addEventListener("change", filterQuotes);
@@ -159,7 +184,5 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error("Category filter element not found in HTML");
   }
 
-  // Example of how to fetch quotes from the server (call when needed):
-  // fetchQuotesFromServer();
-
+  // fetchQuotesFromServer(); // Call this if you want to fetch from the server on load.
 });
