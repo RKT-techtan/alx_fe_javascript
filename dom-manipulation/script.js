@@ -238,3 +238,6 @@ function filterQuotes() {
 createAddQuoteForm();
 populateCategories();
 showRandomQuote();
+
+// Add setInterval here
+setInterval(showRandomQuote, 5000);
