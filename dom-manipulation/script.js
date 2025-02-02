@@ -1,4 +1,4 @@
-// This array holds our quotes. It's initially empty and will be populated
+
 // from local storage or the server.
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "You learn through trials.", category: "Motivation" },
@@ -10,15 +10,15 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "Everyone is smart in their world, depends what world we need fixing at the time", category: "Clarity" },
 ];
 
-// Function to fetch quotes from the server (using POST and handling data transformation).
+
 async function fetchQuotesFromServer() {
   try {
-    const response = await fetch('https://jsonplaceholder.typicode.com/posts', { // Your API endpoint (REPLACE THIS!)
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ // Data to send in the POST request body (REPLACE THIS!)
+      body: JSON.stringify({
         title: 'New Quote Title',
         body: 'New Quote Body',
         userId: 1,
@@ -31,23 +31,22 @@ async function fetchQuotesFromServer() {
 
     const data = await response.json();
 
-    // Handle the response – it could be a single object (POST response) or an array (initial data).
     if (Array.isArray(data)) {
-      const transformedQuotes = data.map(post => ({ // Transform posts to quotes
-        text: post.title, // Adapt this based on your API response
-        category: "General", // Adapt this based on your API response
+      const transformedQuotes = data.map(post => ({
+        text: post.title,
+        category: "General",
       }));
       quotes = transformedQuotes;
     } else if (typeof data === 'object' && data !== null) {
       const newQuote = {
-        text: data.title, // Adapt this based on your API response
-        category: "General", // Adapt this based on your API response
+        text: data.title, 
+        category: "General",
       };
       quotes.push(newQuote);
     } else {
       console.error("Unexpected data format from server:", data);
       quoteDisplay.innerHTML = "<p>Error loading quotes.</p>";
-      return; // Stop processing if data is invalid
+      return;
     }
 
     saveQuotes();
@@ -60,31 +59,31 @@ async function fetchQuotesFromServer() {
   }
 }
 
-// Function to synchronize quotes with the server (if needed).
+
 async function syncQuotes() {
   try {
-    const response = await fetch('/api/quotes', { // Your API endpoint for syncing
-      method: 'POST', // Or PUT, depending on your API
+    const response = await fetch('/api/quotes', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(quotes) // Send the current quotes to the server
+      body: JSON.stringify(quotes)
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json(); // Process the response from the server (optional)
-    console.log("Quotes synced successfully:", data); // Or update quotes based on server response
+    const data = await response.json();
+    console.log("Quotes synced successfully:", data);
 
   } catch (error) {
     console.error("Error syncing quotes with server:", error);
-    // Handle error, e.g., notify the user
+   
   }
 }
 
-// This function shows a random quote on the page.
+
 function showRandomQuote(filteredQuotes = quotes) { 
   const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
   const randomQuote = filteredQuotes[randomIndex];
@@ -98,7 +97,7 @@ function showRandomQuote(filteredQuotes = quotes) {
   }
 }
 
-// This function creates the form for adding new quotes.
+
 function createAddQuoteForm() {
   const form = document.createElement("form");
   form.id = "add-quote-form";
@@ -125,7 +124,7 @@ function createAddQuoteForm() {
   document.body.appendChild(form);
 }
 
-// This function handles adding a new quote.
+
 function handleAddQuote(event) {
   event.preventDefault();
 
@@ -153,7 +152,7 @@ function handleAddQuote(event) {
   syncQuotes();
 }
 
-// Implement JSON Export
+
 function exportToJson() {
   const jsonString = JSON.stringify(quotes, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
@@ -167,7 +166,7 @@ function exportToJson() {
   URL.revokeObjectURL(url);
 }
 
-// Implement JSON Import
+
 function importFromJsonFile(event) {
   const file = event.target.files[0];
   if (file) {
@@ -206,7 +205,7 @@ function populateCategories() {
 
   const uniqueCategories = [...new Set(quotes.map(quote => quote.category))];
 
-  categorySelect.innerHTML = ""; // Clear existing options
+  categorySelect.innerHTML = "";
 
   const allOption = document.createElement("option");
   allOption.value = "All";
@@ -220,7 +219,7 @@ function populateCategories() {
     categorySelect.appendChild(option);
   });
 
-  categorySelect.addEventListener("change", filterQuotes); // Add event listener
+  categorySelect.addEventListener("change", filterQuotes);
 }
 
 function filterQuotes() {
@@ -234,13 +233,13 @@ function filterQuotes() {
   showRandomQuote(filteredQuotes); 
 }
 
-// Initial setup
+
 createAddQuoteForm();
 populateCategories();
 showRandomQuote();
 
-// Add setInterval here
+
 setInterval(showRandomQuote, 5000);
 
-// Add "Quotes synced with server!" to the console log 
+
 console.log("Quotes synced with server!");

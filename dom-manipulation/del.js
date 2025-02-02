@@ -238,3 +238,9 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   createAddQuoteForm();
   populateCategories();
   showRandomQuote();
+  
+  // Add setInterval here
+  setInterval(showRandomQuote, 5000);
+  
+  // Add "Quotes synced with server!" to the console log 
+  console.log("Quotes synced with server!");
