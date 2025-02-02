@@ -8,175 +8,67 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "Everyone is smart in their world, depends what world we need fixing at the time", category: "Clarity" },
 ];
 
-function saveQuotes() {
-  localStorage.setItem('quotes', JSON.stringify(quotes));
-}
-
-const quoteDisplay = document.getElementById("quoteDisplay");
-const newQuoteButton = document.getElementById("newQuote");
-newQuoteButton.addEventListener("click", showRandomQuote);
-showRandomQuote();
-
-function createAddQuoteForm() {
-  const addQuoteSection = document.createElement("div");
-  addQuoteSection.innerHTML = `
-      <input type="text" id="newQuoteText" placeholder="New quote">
-      <input type="text" id="newQuoteCategory" placeholder="Category">
-      <button onclick="addNewQuote()">Add Quote</button> 
-      <button onclick="exportToJson()">Export JSON</button> 
-      <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
-  `;
-  return addQuoteSection;
-}
-
-const addQuoteForm = createAddQuoteForm();
-document.body.appendChild(addQuoteForm);
-
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
-  quoteDisplay.textContent = quotes[randomIndex].text;
-}
+  const randomQuote = quotes[randomIndex];
 
-// Simulate server data
-let serverQuotes = [
-  { text: "Server Quote 1", category: "Server" },
-  { text: "Server Quote 2", category: "Server" },
-];
+  const quoteTextElement = document.getElementById("quoteText"); // Make sure you have an element with this ID in your HTML
+  const quoteCategoryElement = document.getElementById("quoteCategory"); // And this one for the category
 
-async function fetchServerQuotes() {
-  return new Promise(resolve => {
-      setTimeout(() => {
-          resolve(serverQuotes);
-      }, 500);
-  });
-}
-
-async function sendQuotesToServer(quotesToSend) {
-  return new Promise(resolve => {
-      setTimeout(() => {
-          serverQuotes = quotesToSend;
-          resolve();
-      }, 500);
-  });
-}
-
-async function syncWithServer() {
-  try {
-      const fetchedQuotes = await fetchServerQuotes();
-      const serverQuotesLength = serverQuotes.length;
-      const localQuotesLength = quotes.length;
-      quotes = fetchedQuotes; // Server data wins
-      saveQuotes();
-      showRandomQuote();
-      populateCategories();
-
-      const notification = document.getElementById("notification");
-      notification.textContent = "Quotes synced with server.";
-      notification.style.display = "block";
-
-      setTimeout(() => {
-          notification.style.display = "none";
-      }, 3000);
-      if (serverQuotesLength !== localQuotesLength) {
-          console.warn("Quotes synced with server. Server and local quotes are not equal. Conflict might have occurred.")
-      }
-      console.log("Quotes synced with server.");
-  } catch (error) {
-      console.error("Error syncing with server:", error);
-      const notification = document.getElementById("notification");
-      notification.textContent = "Error syncing with server. Check the console.";
-      notification.style.display = "block";
-      setTimeout(() => {
-          notification.style.display = "none";
-      }, 5000);
+  if (quoteTextElement && quoteCategoryElement) {  // Check if elements exist
+    quoteTextElement.textContent = randomQuote.text;
+    quoteCategoryElement.textContent = `- ${randomQuote.category}`; // Added a hyphen for better formatting
+  } else {
+    console.error("Quote text or category element not found!");
   }
 }
 
-syncWithServer();
-setInterval(syncWithServer, 5000);
 
 
-async function addNewQuote() {
-  const quoteText = document.getElementById("newQuoteText").value.trim();
-  const quoteCategory = document.getElementById("newQuoteCategory").value.trim();
+function createAddQuoteForm() {
+  const formContainer = document.createElement('div');
+  formContainer.innerHTML = `
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button onclick="addQuote()">Add Quote</button>
+  `;
 
-  if (!quoteText || !quoteCategory) {
-      alert("Please fill in both the quote and its category.");
-      return;
+  const existingForm = document.querySelector('#quote-form-container'); // ID to hold the form
+  if(existingForm) {
+      existingForm.innerHTML = ''; // Clear any existing form
+      existingForm.appendChild(formContainer);
+  } else {
+      console.error("Form container element not found!");
+      document.body.appendChild(formContainer); // Fallback: add to body if container doesn't exist
   }
 
-  quotes.push({ text: quoteText, category: quoteCategory });
-  await sendQuotesToServer(quotes); // Send to server FIRST
-  saveQuotes(); // THEN update local
+}
 
+function addQuote() {
+  const newQuoteText = document.getElementById("newQuoteText").value;
+  const newQuoteCategory = document.getElementById("newQuoteCategory").value;
 
-  document.getElementById("newQuoteText").value = "";
-  document.getElementById("newQuoteCategory").value = "";
+  if (newQuoteText.trim() !== "" && newQuoteCategory.trim() !== "") {
+    const newQuote = { text: newQuoteText, category: newQuoteCategory };
+    quotes.push(newQuote);
 
-  showRandomQuote();
-  populateCategories();
+    // Clear the form inputs after adding
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
+
+    // Optionally, you could refresh the displayed quote after adding
+    showRandomQuote();
+
+    console.log("Quote added:", newQuote); // For debugging
+  } else {
+    alert("Please enter both a quote and a category.");
+  }
 }
 
 
-function exportToJson() {
-  const jsonString = JSON.stringify(quotes, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'quotes.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+// Example usage (call this when the page loads or a button is clicked)
+// For example in your HTML: <body onload="showRandomQuote()">
+// Or if you have a button: <button onclick="showRandomQuote()">Show Quote</button>
 
-function importFromJsonFile(event) {
-  const fileReader = new FileReader();
-  fileReader.onload = function (event) {
-      try {
-          const importedQuotes = JSON.parse(event.target.result);
-          quotes.push(...importedQuotes);
-          saveQuotes();
-          showRandomQuote();
-          populateCategories();
-          alert('Quotes imported successfully!');
-      } catch (error) {
-          alert('Error importing quotes. Invalid JSON format.');
-          console.error("JSON parsing error:", error);
-      }
-  };
-  fileReader.readAsText(event.target.files[0]);
-}
-
-const categoryFilter = document.getElementById("categoryFilter");
-
-function populateCategories() {
-  const categories = new Set();
-  quotes.forEach(quote => categories.add(quote.category));
-  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
-  categories.forEach(category => {
-      const option = document.createElement('option');
-      option.value = category;
-      option.text = category;
-      categoryFilter.appendChild(option);
-  });
-  const lastFilter = localStorage.getItem('lastFilter') || 'all';
-  categoryFilter.value = lastFilter;
-  filterQuotes();
-}
-
-function filterQuotes() {
-  const selectedCategory = categoryFilter.value;
-  localStorage.setItem('lastFilter', selectedCategory);
-  const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
-  quoteDisplay.innerHTML = ""; //Clear existing quotes.
-  filteredQuotes.forEach(quote => {
-      const quoteElement = document.createElement('p');
-      quoteElement.textContent = `"${quote.text}" - ${quote.category}`;
-      quoteDisplay.appendChild(quoteElement);
-  });
-}
-
-populateCategories();
-categoryFilter.addEventListener("change", filterQuotes);
+// To show the "Add Quote" form:
+// <button onclick="createAddQuoteForm()">Add New Quote</button>
