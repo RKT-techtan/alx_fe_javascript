@@ -20,19 +20,17 @@ function showRandomQuote() {
   // Use the random number to get a quote from our array.
   const randomQuote = quotes[randomIndex];
 
-  // Find the HTML elements where we want to display the quote and category.
-  // You MUST have elements with these IDs in your HTML for this to work!
-  const quoteTextElement = document.getElementById("quote-text");
-  const quoteCategoryElement = document.getElementById("quote-category");
+  // Find the HTML element where we want to display the quote.
+  // You MUST have an element with this ID in your HTML for this to work!
+  const quoteDisplay = document.getElementById("quoteDisplay");
 
-  // Check if the quote elements exist before trying to use them.
-  if (quoteTextElement && quoteCategoryElement) {
-      // Put the quote text into the HTML element.
-      quoteTextElement.innerHTML = randomQuote.text;
-      quoteCategoryElement.innerHTML = `- ${randomQuote.category}`;
+  // Check if the quote element exists before trying to use it.
+  if (quoteDisplay) {
+      // Put the quote text and category into the HTML element.
+      quoteDisplay.innerHTML = `<p>"${randomQuote.text}"</p><p>- ${randomQuote.category}</p>`;
   } else {
-      // If the elements aren't found, tell us in the console. This helps with debugging.
-      console.error("Quote text or category element not found in HTML");
+      // If the element isn't found, tell us in the console. This helps with debugging.
+      console.error("Quote display element not found in HTML");
   }
 }
 
@@ -98,46 +96,46 @@ function handleAddQuote(event) {
   alert("Quote added successfully!");
 
   populateCategories(); // Update the category dropdown
-  filterQuotes();        // Show a relevant quote
+  filterQuotes();       // Show a relevant quote
 }
 
 // Implement JSON Export
 function exportToJson() {
-const jsonString = JSON.stringify(quotes, null, 2); // Beautified JSON
-const blob = new Blob([jsonString], { type: 'application/json' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = 'quotes.json'; // Filename
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
+  const jsonString = JSON.stringify(quotes, null, 2); // Beautified JSON
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quotes.json'; // Filename
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Implement JSON Import
 function importFromJsonFile(event) {
-const file = event.target.files[0];
-if (file) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const importedQuotes = JSON.parse(e.target.result);
-      if (Array.isArray(importedQuotes)) {
-        quotes = importedQuotes; // Replace existing quotes
-        saveQuotes();
-        populateCategories();
-        filterQuotes();
-        alert("Quotes imported successfully!");
-      } else {
-        alert("Invalid JSON file. Must be an array of quote objects.");
-      }
-    } catch (error) {
-      alert("Error parsing JSON file: " + error.message);
-    }
-  };
-  reader.readAsText(file);
-}
+  const file = event.target.files[0];
+  if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+          try {
+              const importedQuotes = JSON.parse(e.target.result);
+              if (Array.isArray(importedQuotes)) {
+                  quotes = importedQuotes; // Replace existing quotes
+                  saveQuotes();
+                  populateCategories();
+                  filterQuotes();
+                  alert("Quotes imported successfully!");
+              } else {
+                  alert("Invalid JSON file. Must be an array of quote objects.");
+              }
+          } catch (error) {
+              alert("Error parsing JSON file: " + error.message);
+          }
+      };
+      reader.readAsText(file);
+  }
 }
 
 function saveQuotes() {
@@ -179,27 +177,29 @@ function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value; // Corrected ID
   localStorage.setItem('selectedCategory', selectedCategory);
 
-  const quoteTextElement = document.getElementById("quote-text");
-  const quoteCategoryElement = document.getElementById("quote-category");
+  const quoteDisplay = document.getElementById("quoteDisplay"); // Use quoteDisplay
 
-  if (!quoteTextElement || !quoteCategoryElement) {
-      console.error("Quote elements not found in HTML");
+  if (!quoteDisplay) {
+      console.error("Quote display element not found in HTML");
       return;
   }
 
   if (selectedCategory === "all") {
-      showRandomQuote();
+      showRandomQuote(); // Show a random quote from all categories
+      return; // Important: Exit the function after showing a random quote
+  }
+
+  const filteredQuotes = quotes.filter(quote => quote.category === selectedCategory);
+
+  if (filteredQuotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+      const randomQuote = filteredQuotes[randomIndex];
+
+      // Update the quoteDisplay element
+      quoteDisplay.innerHTML = `<p>"${randomQuote.text}"</p><p>- ${randomQuote.category}</p>`;
+
   } else {
-      const filteredQuotes = quotes.filter(quote => quote.category === selectedCategory);
-      if (filteredQuotes.length > 0) {
-          const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-          const randomQuote = filteredQuotes[randomIndex];
-          quoteTextElement.innerHTML = randomQuote.text;
-          quoteCategoryElement.innerHTML = `- ${randomQuote.category}`;
-      } else {
-          quoteTextElement.innerHTML = "No quotes in this category yet.";
-          quoteCategoryElement.innerHTML = "";
-      }
+      quoteDisplay.innerHTML = "<p>No quotes in this category yet.</p>";
   }
 }
 
@@ -207,5 +207,4 @@ function filterQuotes() {
 window.addEventListener('DOMContentLoaded', () => {
   showRandomQuote();    // Show a quote when the page loads
   createAddQuoteForm(); // Create the "add quote" form
-  populateCategories(); // Call this to populate on load
 });
