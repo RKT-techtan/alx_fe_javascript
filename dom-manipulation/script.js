@@ -10,15 +10,15 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "Everyone is smart in their world, depends what world we need fixing at the time", category: "Clarity" },
 ];
 
-// Function to save our quotes to local storage.  We'll call this whenever we update the quotes.
+// Function to save our quotes to local storage. We'll call this whenever we update the quotes.
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
 }
 
-// Where we'll display the quote.  Make sure you have an element with the ID "quoteDisplay" in your HTML.
+// Where we'll display the quote. Make sure you have an element with the ID "quoteDisplay" in your HTML.
 const quoteDisplay = document.getElementById("quoteDisplay");
 
-// The button that triggers a new quote.  You'll need a button with the ID "newQuote" in your HTML.
+// The button that triggers a new quote. You'll need a button with the ID "newQuote" in your HTML.
 const newQuoteButton = document.getElementById("newQuote");
 
 // When the "New Quote" button is clicked, we'll show a random quote.
@@ -27,7 +27,7 @@ newQuoteButton.addEventListener("click", showRandomQuote);
 // Show a quote when the page loads.
 showRandomQuote();
 
-// Function to create the form for adding new quotes.  This sets up the input fields and the button.
+// Function to create the form for adding new quotes. This sets up the input fields and the button.
 function createAddQuoteForm() {
   const addQuoteSection = document.createElement("div"); // A container for our form elements
 
@@ -110,7 +110,7 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]); // Read the file
 }
 
-// The category filter dropdown.  Make sure you have this in your HTML with the ID "categoryFilter".
+// The category filter dropdown. Make sure you have this in your HTML with the ID "categoryFilter".
 const categoryFilter = document.getElementById("categoryFilter");
 
 // Function to fill the category dropdown with the available categories.
@@ -141,7 +141,7 @@ function filterQuotes() {
   // Filter the quotes. Show all if "all" is selected, otherwise filter by category.
   const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
 
-  // Clear the quote display.  This is *essential* to avoid showing the wrong quotes.
+  // Clear the quote display. This is *essential* to avoid showing the wrong quotes.
   quoteDisplay.innerHTML = "";
 
   // Now add the filtered quotes to the display.
@@ -150,11 +150,11 @@ function filterQuotes() {
       quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
       quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
   });
-  
+
 }
 
 // Set up the category dropdown when the page loads.
 populateCategories();
 
-// Listen for changes to the category dropdown.  When it changes, filter the quotes.
+// Listen for changes to the category dropdown. When it changes, filter the quotes.
 categoryFilter.addEventListener("change", filterQuotes);
