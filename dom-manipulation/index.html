@@ -16,7 +16,12 @@
     <button onclick="addQuote()">Add Quote</button>
   </div>
 
-  <button onclick="exportQuotes()">Export Quotes</button> <--- Added Export Button
+  <button onclick="exportQuotes()">Export Quotes</button>
+
+  <div>
+    <input type="file" id="fileInput" accept=".json">
+    <button onclick="importQuotes()">Import Quotes</button>
+  </div>
 
   <script src="script.js"></script>
 </body>
