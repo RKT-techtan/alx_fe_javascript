@@ -12,6 +12,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 
 // Function to save the quotes array to local storage.  We'll use this whenever we change the quotes.
 function saveQuotes() {
+  
   localStorage.setItem('quotes', JSON.stringify(quotes));
 }
 
