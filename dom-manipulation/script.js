@@ -109,7 +109,7 @@ function importFromJsonFile(event) {
   };
   fileReader.readAsText(event.target.files[0]); // Read the file
 }
-
+//Space
 
 
 // Function to fill the category dropdown with the available categories.
