@@ -12,63 +12,76 @@ function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
 
-  const quoteTextElement = document.getElementById("quoteText"); // Make sure you have an element with this ID in your HTML
-  const quoteCategoryElement = document.getElementById("quoteCategory"); // And this one for the category
+  const quoteTextElement = document.getElementById("quoteText");
+  const quoteCategoryElement = document.getElementById("quoteCategory");
 
-  if (quoteTextElement && quoteCategoryElement) {  // Check if elements exist
+  if (quoteTextElement && quoteCategoryElement) {
     quoteTextElement.textContent = randomQuote.text;
-    quoteCategoryElement.textContent = `- ${randomQuote.category}`; // Added a hyphen for better formatting
+    quoteCategoryElement.textContent = `- ${randomQuote.category}`;
   } else {
     console.error("Quote text or category element not found!");
   }
 }
-
-
 
 function createAddQuoteForm() {
   const formContainer = document.createElement('div');
   formContainer.innerHTML = `
     <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
     <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button onclick="addQuote()">Add Quote</button>
+    <button id="addQuoteButton">Add Quote</button>
   `;
 
-  const existingForm = document.querySelector('#quote-form-container'); // ID to hold the form
-  if(existingForm) {
-      existingForm.innerHTML = ''; // Clear any existing form
+  const existingForm = document.querySelector('#quote-form-container');
+  if (existingForm) {
+      existingForm.innerHTML = '';
       existingForm.appendChild(formContainer);
   } else {
       console.error("Form container element not found!");
-      document.body.appendChild(formContainer); // Fallback: add to body if container doesn't exist
+      document.body.appendChild(formContainer); // Fallback (not ideal)
   }
 
+  const addQuoteButton = document.getElementById("addQuoteButton");
+  if (addQuoteButton) {
+    addQuoteButton.addEventListener("click", addQuote);
+  } else {
+      console.error("Add Quote button not found!");
+  }
 }
 
 function addQuote() {
-  const newQuoteText = document.getElementById("newQuoteText").value;
-  const newQuoteCategory = document.getElementById("newQuoteCategory").value;
+  const newQuoteText = document.getElementById("newQuoteText").value.trim();
+  const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
-  if (newQuoteText.trim() !== "" && newQuoteCategory.trim() !== "") {
+  if (newQuoteText !== "" && newQuoteCategory !== "") {
     const newQuote = { text: newQuoteText, category: newQuoteCategory };
     quotes.push(newQuote);
 
-    // Clear the form inputs after adding
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
-    // Optionally, you could refresh the displayed quote after adding
-    showRandomQuote();
+    showRandomQuote(); // Refresh the displayed quote
 
-    console.log("Quote added:", newQuote); // For debugging
+    console.log("Quote added:", newQuote);
   } else {
     alert("Please enter both a quote and a category.");
   }
 }
 
+// Event listeners after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  showRandomQuote(); // Show initial quote
 
-// Example usage (call this when the page loads or a button is clicked)
-// For example in your HTML: <body onload="showRandomQuote()">
-// Or if you have a button: <button onclick="showRandomQuote()">Show Quote</button>
+  const showQuoteButton = document.getElementById("showQuoteButton");
+  if (showQuoteButton) {
+      showQuoteButton.addEventListener("click", showRandomQuote);
+  } else {
+      console.error("Show Quote button not found!");
+  }
 
-// To show the "Add Quote" form:
-// <button onclick="createAddQuoteForm()">Add New Quote</button>
+  const addNewQuoteButton = document.getElementById("addNewQuoteButton");
+  if (addNewQuoteButton) {
+      addNewQuoteButton.addEventListener("click", createAddQuoteForm);
+  } else {
+      console.error("Add New Quote button not found!");
+  }
+});
