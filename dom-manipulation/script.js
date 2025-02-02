@@ -119,7 +119,7 @@ function populateCategories() {
   // A Set is perfect for keeping track of categories - it only allows unique values.
   const categories = new Set();
 
-  // Let's loop through our quotes and grab each category, adding it to the Set.
+  // Let's loop through our quotes and grab each category, adding it to the Set.  Using map here is fine, but forEach is more appropriate since we're not creating a new array.
   quotes.forEach(quote => categories.add(quote.category));
 
   // Clear out any existing options in the dropdown and add the "All Categories" choice.
