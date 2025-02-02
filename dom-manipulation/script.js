@@ -158,15 +158,68 @@ function saveQuotes() {
 // <button onclick="exportToJson()">Export Quotes to JSON</button>
 // <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
 
-// OR, if you want to create them dynamically:
-// const exportButton = document.createElement('button');
-// exportButton.textContent = "Export Quotes to JSON";
-// exportButton.onclick = exportToJson;
-// document.body.appendChild(exportButton);
+function populateCategories() {
+  const categorySelect = document.getElementById("category-filter"); // Get the dropdown
 
-// const importInput = document.createElement('input');
-// importInput.type = "file";
-// importInput.id = "importFile";
+  if (!categorySelect) {
+      console.error("Category filter element not found in HTML");
+      return; // Exit if the element isn't there
+  }
+
+  const uniqueCategories = [...new Set(quotes.map(quote => quote.category))]; // Get unique categories
+
+  // Add "All" option
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.text = "All";
+  categorySelect.appendChild(allOption);
+
+
+  uniqueCategories.forEach(category => {
+      const option = document.createElement("option");
+      option.value = category;
+      option.text = category;
+      categorySelect.appendChild(option);
+  });
+
+  // Restore last selected filter
+  const lastSelectedCategory = localStorage.getItem('selectedCategory');
+  if (lastSelectedCategory) {
+      categorySelect.value = lastSelectedCategory;
+  }
+
+  categorySelect.addEventListener("change", filterQuotes);
+}
+
+function filterQuotes() {
+  const selectedCategory = document.getElementById("category-filter").value;
+  localStorage.setItem('selectedCategory', selectedCategory); // Save selected filter
+
+  const quoteTextElement = document.getElementById("quote-text");
+  const quoteCategoryElement = document.getElementById("quote-category");
+
+  if (!quoteTextElement || !quoteCategoryElement) {
+      console.error("Quote elements not found in HTML");
+      return;
+  }
+
+  if (selectedCategory === "all") {
+      showRandomQuote(); // Show a random quote if "All" is selected
+
+  } else {
+    const filteredQuotes = quotes.filter(quote => quote.category === selectedCategory);
+    if(filteredQuotes.length > 0){
+      const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+      const randomQuote = filteredQuotes[randomIndex];
+      quoteTextElement.innerHTML = randomQuote.text;
+      quoteCategoryElement.innerHTML = `- ${randomQuote.category}`;
+    } else {
+      quoteTextElement.innerHTML = "No quotes in this category yet.";
+      quoteCategoryElement.innerHTML = "";
+    }
+  }
+}
+
 // importInput.accept = ".json";
 // importInput.onchange = importFromJsonFile;
 // document.body.appendChild(importInput);
