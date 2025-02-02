@@ -18,4 +18,4 @@ Filter and Sync Data:
 Implement dynamic content filtering based on user-selected criteria.
 Sync local data with a server, handling potential conflicts and ensuring data consistency.
 
-
+“DOM Manipulation, Web Storage, and Working with JSON Data” project!
