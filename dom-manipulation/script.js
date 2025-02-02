@@ -109,56 +109,55 @@ function importFromJsonFile(event) {
   };
   fileReader.readAsText(event.target.files[0]); // Read the file
 }
-//Space
 
 
-// First, we need to find the dropdown in our HTML.  Hopefully, it's there!  You'll need to add this <select> element to your HTML.
+// First, we need to find the dropdown in our HTML.  Hopefully, it's there! You'll need to add this <select> element to your HTML.
 const categoryFilter = document.getElementById("categoryFilter");
 
 // Time to fill that dropdown with all the different categories.
 function populateCategories() {
-    // A Set is perfect for keeping track of categories - it only allows unique values.
-    const categories = new Set();
+  // A Set is perfect for keeping track of categories - it only allows unique values.
+  const categories = new Set();
 
-    // Let's loop through our quotes and grab each category, adding it to the Set.
-    quotes.forEach(quote => categories.add(quote.category));
+  // Let's loop through our quotes and grab each category, adding it to the Set.
+  quotes.forEach(quote => categories.add(quote.category));
 
-    // Clear out any existing options in the dropdown and add the "All Categories" choice.
-    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+  // Clear out any existing options in the dropdown and add the "All Categories" choice.
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
 
-    // Now, let's create an option for each unique category we found.
-    categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.text = category;
-        categoryFilter.appendChild(option);
-    });
+  // Now, let's create an option for each unique category we found.
+  categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.text = category;
+      categoryFilter.appendChild(option);
+  });
 
-    // Did the user have a category selected last time? Let's restore it if so.
-    const lastFilter = localStorage.getItem('lastFilter') || 'all'; // Default to "all" if nothing's saved.
-    categoryFilter.value = lastFilter;
+  // Did the user have a category selected last time? Let's restore it if so.
+  const lastFilter = localStorage.getItem('lastFilter') || 'all'; // Default to "all" if nothing's saved.
+  categoryFilter.value = lastFilter;
 
-    // And finally, let's apply the filter so the quotes are updated right away.
-    filterQuotes();
+  // And finally, let's apply the filter so the quotes are updated right away.
+  filterQuotes();
 }
 
 // Function to filter the quotes based on the selected category.
 function filterQuotes() {
-    const selectedCategory = categoryFilter.value; // Which category did they choose?
-    localStorage.setItem('lastFilter', selectedCategory); // Save their choice for next time
+  const selectedCategory = categoryFilter.value; // Which category did they choose?
+  localStorage.setItem('lastFilter', selectedCategory); // Save their choice for next time
 
-    // Filter the quotes. Show all if "all" is selected, otherwise filter by category.
-    const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
+  // Filter the quotes. Show all if "all" is selected, otherwise filter by category.
+  const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
 
-    // Clear the quote display. This is *essential* to avoid showing the wrong quotes.
-    quoteDisplay.innerHTML = "";
+  // Clear the quote display. This is *essential* to avoid showing the wrong quotes.
+  quoteDisplay.innerHTML = "";
 
-    // Now add the filtered quotes to the display.
-    filteredQuotes.forEach(quote => {
-        const quoteElement = document.createElement('p'); // Make a paragraph for each quote
-        quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
-        quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
-    });
+  // Now add the filtered quotes to the display.
+  filteredQuotes.forEach(quote => {
+      const quoteElement = document.createElement('p'); // Make a paragraph for each quote
+      quoteElement.textContent = `"${quote.text}" - ${quote.category}`; // Put the quote text in the paragraph
+      quoteDisplay.appendChild(quoteElement); // Add the paragraph to the display
+  });
 
 }
 
