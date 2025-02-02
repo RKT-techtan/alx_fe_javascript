@@ -1,6 +1,6 @@
-// This is an array called 'quotes'.  It holds a bunch of quote objects.
+// This is an array called 'quotes'. It holds a bunch of quote objects.
 // Each quote object has two properties: 'text' (the actual quote) and 'category'.
-const quotes = [
+let quotes = JSON.parse(localStorage.getItem('quotes')) || [ // Load from localStorage or default
   { text: "You learn through trials.", category: "Motivation" },
   { text: "Even a follower is as important as the leader.", category: "Inspiration" },
   { text: "Dreamland is as important as working hard.", category: "Vision" },
@@ -10,7 +10,12 @@ const quotes = [
   { text: "Everyone is smart in their world, depends what world we need fixing at the time", category: "Clarity" },
 ];
 
-// This gets the HTML element where we'll display the quote.  It finds the element with the ID "quoteDisplay".
+// Save quotes to localStorage
+function saveQuotes() { // Added saveQuotes function
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// This gets the HTML element where we'll display the quote. It finds the element with the ID "quoteDisplay".
 const quoteDisplay = document.getElementById("quoteDisplay");
 
 // This gets the button that will be used to show a new quote. It finds the element with the ID "newQuote".
@@ -28,12 +33,13 @@ function createAddQuoteForm() {
   // Creates a new div element. This will hold our form elements.
   const addQuoteSection = document.createElement("div");
 
-  // Sets the HTML inside the div.  This creates the input fields and the button.
+  // Sets the HTML inside the div. This creates the input fields and the button.
   // The backticks (`) allow us to write multi-line strings and embed variables.
   addQuoteSection.innerHTML = `
-  <input type="text" id="newQuoteText" placeholder="New quote">
-  <input type="text" id="newQuoteCategory" placeholder="Category">
-  <button onclick="addNewQuote()">Add Quote</button>  
+    <input type="text" id="newQuoteText" placeholder="New quote">
+    <input type="text" id="newQuoteCategory" placeholder="Category">
+    <button onclick="addNewQuote()">Add Quote</button> 
+    <button onclick="exportToJson()">Export JSON</button> <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
   `; // The onclick event here will call the addNewQuote function when the button is clicked.
 
   // Returns the div element containing the form.
@@ -43,7 +49,7 @@ function createAddQuoteForm() {
 // Calls the createAddQuoteForm function to actually create the form and stores it in the addQuoteForm variable.
 const addQuoteForm = createAddQuoteForm();
 
-// Adds the newly created form to the page.  It appends it to the <body> of the HTML.
+// Adds the newly created form to the page. It appends it to the <body> of the HTML.
 document.body.appendChild(addQuoteForm);
 
 
@@ -69,14 +75,16 @@ function addNewQuote() {
 
   // Checks if both the quote text and category are filled in.
   if (!quoteText || !quoteCategory) {
-      // Shows an alert if either field is empty.
-      alert("Please fill in both the quote and its category.");
-      // Stops the function from running any further.
-      return;
+    // Shows an alert if either field is empty.
+    alert("Please fill in both the quote and its category.");
+    // Stops the function from running any further.
+    return;
   }
 
   // Adds the new quote object to the 'quotes' array using the push method.
   quotes.push({ text: quoteText, category: quoteCategory });
+
+  saveQuotes(); // Save to localStorage after adding
 
   // Clears the input fields after the quote is added.
   document.getElementById("newQuoteText").value = "";
@@ -84,4 +92,36 @@ function addNewQuote() {
 
   // Shows a new random quote after adding the quote.
   showRandomQuote();
+}
+
+function exportToJson() { // Added exportToJson function
+  const jsonString = JSON.stringify(quotes, null, 2); // Beautify JSON output
+
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quotes.json'; // Set filename
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a); // Clean up
+  URL.revokeObjectURL(url);
+}
+
+function importFromJsonFile(event) { // Added importFromJsonFile function
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    try { // Add try-catch block for JSON parsing errors
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes); // Add imported quotes to existing quotes
+      saveQuotes();
+      showRandomQuote(); // Show a new quote after import
+      alert('Quotes imported successfully!');
+    } catch (error) {
+      alert('Error importing quotes. Invalid JSON format.');
+      console.error("JSON parsing error:", error); // Log the error to the console
+    }
+  };
+  fileReader.readAsText(event.target.files[0]);
 }
